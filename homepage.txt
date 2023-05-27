@@ -1,0 +1,158 @@
+// ignore_for_file: prefer_const_constructors
+
+import 'package:flutter/material.dart';
+import 'package:translator/translator.dart';
+
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  //Variable for translatedText, datatype is String, for storing the User's input
+  String translatedText = " ";
+  //Variable
+
+  //TextEditingController receives the text entered by the user
+  TextEditingController englishController = TextEditingController();
+  TextEditingController resultController = TextEditingController();
+
+  Map<String, String> countryLanguage = {
+    "English": "en",
+    "Hindi": "hi",
+    "Nepali": "ne",
+    "Japanese": "ja",
+    "Korean": "ko",
+    "Spanish": "es",
+    "French": "fr",
+  };
+  String dropdownValueForTranslateFrom = "English";
+  String dropdownValueForTranslateTo = "Nepali";
+
+  //Translate Code //package //function
+  void translate(String translateTo, translateFrom) async {
+    final translator = GoogleTranslator();
+    final input = englishController.text;
+
+    translator
+        .translate(input, from: '$translateFrom', to: '$translateTo')
+        .then((value) {
+      setState(() {
+        //Data (Text) by Users is stored in value: value = translatedText //value is the translated text
+        translatedText = value.toString();
+      });
+    });
+  }
+  //End Code
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text("Translator App "),
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Text("From:",
+                        style: TextStyle(fontWeight: FontWeight.bold)),
+                    //From
+                    //Create DropDown Menu with English, Hindi, Nepali, Chinese, Japanese, Korean, Spanish
+                    DropdownButton(
+                      value: dropdownValueForTranslateFrom,
+                      underline: Container(
+                        height: 2,
+                        color: Colors.teal,
+                      ),
+                      items: countryLanguage.keys.map((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          dropdownValueForTranslateFrom = value!;
+                        });
+                      },
+                    ),
+                    //To
+                    Text("To:",
+                        //Create DropDown Menu with English, Hindi, Nepali, Chinese, Japanese, Korean, Spanish
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 16.0)),
+                    DropdownButton(
+                      value: dropdownValueForTranslateTo,
+                      underline: Container(
+                        height: 2,
+                        color: Colors.teal,
+                      ),
+                      items: countryLanguage.keys.map((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          dropdownValueForTranslateTo = value!;
+                        });
+                      },
+                    ),
+                  ],
+                ),
+
+                SizedBox(height: 10.0),
+
+                //TextFormField
+                TextFormField(
+                  controller: englishController,
+                  maxLines: 6,
+                  decoration: InputDecoration(
+                    hintText: "Enter  $dropdownValueForTranslateFrom Text",
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+
+                SizedBox(height: 10.0),
+
+                //Button
+                MaterialButton(
+                    color: Colors.teal,
+                    onPressed: () {
+                      String to = countryLanguage[dropdownValueForTranslateTo]!;
+                      String from =
+                          countryLanguage[dropdownValueForTranslateFrom]!;
+                      translate(to, from);
+                    },
+                    child: Text(
+                      "Translate",
+                      style: TextStyle(color: Colors.white),
+                    )),
+                SizedBox(height: 10.0),
+                //TextFormField //prints the translated text
+                // Text(translatedText, style: TextStyle(fontSize: 30.0)),
+
+                //Translated Text //prints the translated text
+                TextField(
+                  controller: resultController,
+                  decoration: InputDecoration(
+                    hintText: "Translated text",
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
